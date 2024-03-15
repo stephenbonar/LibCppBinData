@@ -14,11 +14,11 @@
 // See the License for the specific language governing permissionsand
 // limitations under the License.
 
-#include "StandardFileStream.h"
+#include "StdFileStream.h"
 
 namespace BinData
 {
-    std::size_t StandardFileStream::Size() const
+    std::size_t StdFileStream::Size() const
     {
         if (IsOpen())
             return mSize;
@@ -28,7 +28,7 @@ namespace BinData
             return 0;
     }
 
-    void StandardFileStream::Open(FileMode m)
+    void StdFileStream::Open(FileMode m)
     {
         if (std::filesystem::exists(mFileName))
             mSize = std::filesystem::file_size(mFileName);
@@ -57,13 +57,13 @@ namespace BinData
         mMode = m;
     }
 
-    void StandardFileStream::Read(Field* f)
+    void StdFileStream::Read(Field* f)
     {
         mStream.read(f->Data(), f->Size());
         mOffset += f->Size();
     }
 
-    void StandardFileStream::Write(Field* f)
+    void StdFileStream::Write(Field* f)
     {
         mStream.write(f->Data(), f->Size());
         mOffset += f->Size();
@@ -71,7 +71,7 @@ namespace BinData
             mSize = mOffset;
     }
 
-    void StandardFileStream::SetOffset(std::size_t o)
+    void StdFileStream::SetOffset(std::size_t o)
     {
         mOffset = o;
         mStream.seekg(mOffset);
@@ -79,7 +79,7 @@ namespace BinData
 
     RawFile CreateFile(std::string fileName)
     {
-        auto standardStream = std::make_shared<StandardFileStream>(fileName);
+        auto standardStream = std::make_shared<StdFileStream>(fileName);
         auto baseStream = std::static_pointer_cast<FileStream>(standardStream);
         return RawFile{ baseStream };
     }

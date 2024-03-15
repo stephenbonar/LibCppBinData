@@ -22,7 +22,7 @@ set(LIB_SOURCES
     RawField.cpp
     StringField.cpp
     IntField.cpp
-    StandardFileStream.cpp)
+    StdFileStream.cpp)
 
 # Configure the library build target.
 add_library(LibCppBinData ${LIB_SOURCES})

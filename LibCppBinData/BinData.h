@@ -22,7 +22,7 @@
 #include "Format.h"
 #include "IntField.h"
 #include "RawField.h"
-#include "StandardFileStream.h"
+#include "StdFileStream.h"
 #include "StringField.h"
 
 #endif

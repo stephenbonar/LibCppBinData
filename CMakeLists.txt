@@ -22,7 +22,7 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 # Configure the project name and version, which is configured into the binary.
-project(LibCppBinData VERSION 0.80)
+project(LibCppBinData VERSION 0.81)
 
 # Although the project command can natively pass the name and version into
 # the program through the configure_file command, there is no native RELEASE

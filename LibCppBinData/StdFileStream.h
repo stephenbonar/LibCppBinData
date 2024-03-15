@@ -14,8 +14,8 @@
 // See the License for the specific language governing permissionsand
 // limitations under the License.
 
-#ifndef STANDARD_FILE_STREAM_H
-#define STANDARD_FILE_STREAM_H
+#ifndef STD_FILE_STREAM_H
+#define STD_FILE_STREAM_H
 
 #include <fstream>
 #include <memory>
@@ -24,10 +24,10 @@
 
 namespace BinData
 {
-    class StandardFileStream : public FileStream
+    class StdFileStream : public FileStream
     {
     public:
-        StandardFileStream(std::string fileName) 
+        StdFileStream(std::string fileName) 
             : mFileName{ fileName }, mStream{}, 
             mMode{ FileMode::Read }, mSize{ 0 }, mOffset{ 0 }
         {

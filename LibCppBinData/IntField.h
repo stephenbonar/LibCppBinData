@@ -18,6 +18,7 @@
 #define BIN_DATA_INT_FIELD_H
 
 #include <cstddef>
+#include <cstring>
 #include <memory>
 #include <sstream>
 #include <limits>

@@ -18,6 +18,7 @@
 #define BIN_DATA_H
 
 #include <cstddef>
+#include <cstring>
 #include <string>
 #include <memory>
 #include "Field.h"

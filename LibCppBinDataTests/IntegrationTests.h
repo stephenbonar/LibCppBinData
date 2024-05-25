@@ -11,7 +11,7 @@
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissionsand
+// See the License for the specific language governing permissions and
 // limitations under the License.
 
 #ifndef INTEGRATION_TESTS_H
@@ -24,6 +24,7 @@
 #include "RawField.h"
 #include "IntField.h"
 #include "StdFileStream.h"
+#include "Endianness.h"
 
 struct FileData
 {
@@ -39,7 +40,7 @@ struct FileData
     BinData::Int32Field i32;
     BinData::UInt64Field ui64;
     BinData::Int64Field i64;
-    BinData::Int32Field i32BE{ BinData::FieldEndianness::Big };
+    BinData::Int32Field i32BE{ BinData::Endianness::Big };
 };
 
 struct AppendedData

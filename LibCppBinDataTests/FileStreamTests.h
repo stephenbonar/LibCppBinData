@@ -1,4 +1,4 @@
-// BinData.h - Main library header file.
+// FileStreamTests.h - Declares the FileStreamTests class.
 //
 // Copyright (C) 2024 Stephen Bonar
 //
@@ -14,17 +14,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef LIB_CPP_BIN_DATA_H
-#define LIB_CPP_BIN_DATA_H
+#ifndef BIN_DATA_FILE_STREAM_TESTS_H
+#define BIN_DATA_FILE_STREAM_TESTS_H
 
-#include "Field.h"
-#include "FieldStruct.h"
-#include "ChunkHeader.h"
-#include "File.h"
-#include "Format.h"
-#include "IntField.h"
-#include "RawField.h"
-#include "StdFileStream.h"
-#include "StringField.h"
+#include <gtest/gtest.h>
+
+class FileStreamTests : public ::testing::Test
+{
+    
+};
 
 #endif

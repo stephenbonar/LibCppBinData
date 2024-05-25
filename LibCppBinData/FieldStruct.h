@@ -1,4 +1,4 @@
-// BinData.h - Main library header file.
+// FieldStruct.h - Declares the FieldStruct abstract class.
 //
 // Copyright (C) 2024 Stephen Bonar
 //
@@ -14,17 +14,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef LIB_CPP_BIN_DATA_H
-#define LIB_CPP_BIN_DATA_H
+#ifndef BIN_DATA_FIELD_STRUCT_H
+#define BIN_DATA_FIELD_STRUCT_H
 
+#include <vector>
 #include "Field.h"
-#include "FieldStruct.h"
-#include "ChunkHeader.h"
-#include "File.h"
-#include "Format.h"
-#include "IntField.h"
-#include "RawField.h"
-#include "StdFileStream.h"
-#include "StringField.h"
+
+namespace BinData
+{
+    class FieldStruct
+    {
+    public:
+        virtual std::vector<std::shared_ptr<Field>> Fields() const = 0;
+
+        std::size_t TotalSize() const;
+    };
+}
 
 #endif

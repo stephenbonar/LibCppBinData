@@ -1,4 +1,4 @@
-// BinData.h - Main library header file.
+// FileStream.cpp - Defines the FileStream class methods.
 //
 // Copyright (C) 2024 Stephen Bonar
 //
@@ -14,17 +14,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef LIB_CPP_BIN_DATA_H
-#define LIB_CPP_BIN_DATA_H
+#include "FileStream.h"
 
-#include "Field.h"
-#include "FieldStruct.h"
-#include "ChunkHeader.h"
-#include "File.h"
-#include "Format.h"
-#include "IntField.h"
-#include "RawField.h"
-#include "StdFileStream.h"
-#include "StringField.h"
+using namespace BinData;
 
-#endif
+bool FileStream::IsAtBeginning() const
+{
+
+}
+
+bool FileStream::IsAtEnd() const
+{
+    
+}

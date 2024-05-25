@@ -146,8 +146,8 @@ void IntegrationTests::RefreshWriteDataFile()
 
 TEST_F(IntegrationTests, CreatesFileInstanceProperly)
 {
-    ASSERT_NO_THROW(BinData::CreateFile("Test.txt"));
-    auto f = BinData::CreateFile("Test.txt");
+    ASSERT_NO_THROW(BinData::RawFile{ "Test.txt" });
+    auto f = BinData::RawFile{ "Test.txt" };
     EXPECT_EQ(f.Name(), "Test.txt");
     EXPECT_EQ(f.Mode(), BinData::FileMode::Read);
     EXPECT_EQ(f.Offset(), 0);
@@ -156,8 +156,8 @@ TEST_F(IntegrationTests, CreatesFileInstanceProperly)
 
 TEST_F(IntegrationTests, ReadsFileProperly)
 {
-    ASSERT_NO_THROW(BinData::CreateFile("TestReadData"));
-    auto f = BinData::CreateFile("TestReadData");
+    ASSERT_NO_THROW(BinData::RawFile{ "TestReadData" });
+    auto f = BinData::RawFile{ "TestReadData" };
     FileData data;
     ASSERT_NO_THROW(f.Open());
     ExpectAfterOpenState(f, BinData::FileMode::Read);
@@ -173,8 +173,8 @@ TEST_F(IntegrationTests, WritesFileProperly)
 
     // Write the expected FileData to the file so we can read it back in and
     // verify it was written properly.
-    ASSERT_NO_THROW(BinData::CreateFile("TestWriteData"));
-    auto f = BinData::CreateFile("TestWriteData");
+    ASSERT_NO_THROW(BinData::RawFile{ "TestWriteData" });
+    auto f = BinData::RawFile{ "TestWriteData" };
     ASSERT_NO_THROW(f.Open(BinData::FileMode::Write));
     ExpectAfterOpenState(f, BinData::FileMode::Write);
     WriteFileData(f, expectedData);
@@ -226,8 +226,8 @@ TEST_F(IntegrationTests, WritesFileProperly)
 
 TEST_F(IntegrationTests, CanReadFromSpecificOffsets)
 {
-    ASSERT_NO_THROW(BinData::CreateFile("TestReadData"));
-    auto f = BinData::CreateFile("TestReadData");
+    ASSERT_NO_THROW(BinData::RawFile{ "TestReadData" });
+    auto f = BinData::RawFile{ "TestReadData" };
     BinData::UInt8Field ui8;
     BinData::UInt24Field ui24;
     BinData::UInt64Field ui64;
@@ -247,8 +247,8 @@ TEST_F(IntegrationTests, CanWriteToSpecificOffsets)
 {
     RefreshWriteDataFile();
     std::filesystem::copy_file("TestReadData", "TestWriteData");
-    ASSERT_NO_THROW(BinData::CreateFile("TestWriteData"));
-    auto f = BinData::CreateFile("TestWriteData");
+    ASSERT_NO_THROW(BinData::RawFile{ "TestWriteData" });
+    auto f = BinData::RawFile{ "TestWriteData" };
     BinData::UInt8Field ui8Write{ 99 };
     BinData::UInt24Field ui24Write{ 99 };
     BinData::UInt64Field ui64Write{ 99 };
@@ -275,8 +275,8 @@ TEST_F(IntegrationTests, CanWriteToSpecificOffsets)
 
 TEST_F(IntegrationTests, DoesNotAllowAFileToBeOpenTwice)
 {
-    ASSERT_NO_THROW(BinData::CreateFile("TestReadData"));
-    auto f = BinData::CreateFile("TestReadData");
+    ASSERT_NO_THROW(BinData::RawFile{ "TestWriteData" });
+    auto f = BinData::RawFile{ "TestWriteData" };
     ASSERT_NO_THROW(f.Open());
     EXPECT_THROW(f.Open(), BinData::InvalidFileOperation);
     EXPECT_THROW(f.Open(BinData::FileMode::Write), 
@@ -285,8 +285,8 @@ TEST_F(IntegrationTests, DoesNotAllowAFileToBeOpenTwice)
 
 TEST_F(IntegrationTests, DoesNotAllowOffsetBeyondEndOfFile)
 {
-    ASSERT_NO_THROW(BinData::CreateFile("TestReadData"));
-    auto f = BinData::CreateFile("TestReadData");
+    ASSERT_NO_THROW(BinData::RawFile{ "TestReadData" });
+    auto f = BinData::RawFile{ "TestReadData" };
     ASSERT_NO_THROW(f.SetOffset(47));
     EXPECT_THROW(f.SetOffset(48), BinData::InvalidFileOperation);
     EXPECT_THROW(f.SetOffset(100), BinData::InvalidFileOperation);
@@ -296,8 +296,8 @@ TEST_F(IntegrationTests, EnsuresFileIsOpenBeforeReadingOrWriting)
 {
     RefreshWriteDataFile();
     std::filesystem::copy_file("TestReadData", "TestWriteData");
-    ASSERT_NO_THROW(BinData::CreateFile("TestWriteData"));
-    auto f = BinData::CreateFile("TestWriteData");
+    ASSERT_NO_THROW(BinData::RawFile{ "TestWriteData" });
+    auto f = BinData::RawFile{ "TestWriteData" };
     FileData readData;
     EXPECT_THROW(f.Read(&readData.ui8), BinData::InvalidFileOperation);
     EXPECT_THROW(f.Write(&expectedData.ui8), BinData::InvalidFileOperation);

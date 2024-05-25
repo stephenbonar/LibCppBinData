@@ -11,7 +11,7 @@
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissionsand
+// See the License for the specific language governing permissions and
 // limitations under the License.
 
 #ifndef BIN_DATA_FILE_H
@@ -25,6 +25,8 @@
 #include <memory>
 #include "Field.h"
 #include "FileStream.h"
+#include "FieldStruct.h"
+#include "ChunkHeader.h"
 
 namespace BinData
 {
@@ -75,6 +77,12 @@ namespace BinData
         /// @pre The offset must be no greater than file size.
         /// @post The offset must have advanced by field size.
         virtual void Write(Field* f) = 0;
+
+        virtual void Read(FieldStruct* s) = 0;
+
+        virtual void Write(FieldStruct* s) = 0;
+
+        virtual ChunkHeader FindChunkHeader(std::string ID) = 0;
 
         virtual std::string Name() const = 0;
 

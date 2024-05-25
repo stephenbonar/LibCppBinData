@@ -19,7 +19,9 @@
 using ::testing::Exactly;
 using ::testing::Return;
 using ::testing::AtLeast;
+using ::testing::InSequence;
 using ::testing::_;
+using namespace BinData;
 
 RawFileTests::RawFileTests()
 {
@@ -101,7 +103,8 @@ TEST_F(RawFileTests, CreatesFileProperly)
 
 TEST_F(RawFileTests, DoesNotCreateInvalidFile)
 {
-    ASSERT_THROW(BinData::RawFile f(nullptr), BinData::InvalidFile);
+    std::shared_ptr<BinData::FileStream> nullStream = nullptr;
+    ASSERT_THROW(BinData::RawFile f{ nullStream }, BinData::InvalidFile);
 }
 
 TEST_F(RawFileTests, DoesNotAttemptToOpenNonExistantFileForReading)
@@ -159,7 +162,7 @@ TEST_F(RawFileTests, OpensAndClosesFileForReadWriteProperly)
     ExpectOpensAndClosesProperly(BinData::FileMode::ReadWrite);
 }
 
-TEST_F(RawFileTests, ReadsFileProperly)
+TEST_F(RawFileTests, ReadsFieldProperly)
 {
     InitializeTestFile();
 
@@ -188,7 +191,7 @@ TEST_F(RawFileTests, ReadsFileProperly)
     ASSERT_NO_THROW(testFile->Read(&mockField));
 }
 
-TEST_F(RawFileTests, WritesFileProperly)
+TEST_F(RawFileTests, WritesFieldProperly)
 {
     InitializeTestFile();
 
@@ -212,6 +215,154 @@ TEST_F(RawFileTests, WritesFileProperly)
 
     ASSERT_NO_THROW(testFile->Open(BinData::FileMode::Write));
     ASSERT_NO_THROW(testFile->Write(&mockField));
+}
+
+TEST_F(RawFileTests, ReadsFieldStructsProperly)
+{
+    InitializeTestFile();
+    auto field1 = std::make_shared<MockField>();
+    auto field2 = std::make_shared<MockField>();
+    std::vector<std::shared_ptr<Field>> fields
+    {
+        field1,
+        field2
+    };
+
+    EXPECT_CALL(*mockStream, IsOpen())
+        .WillOnce(Return(false))
+        .WillRepeatedly(Return(true));
+    EXPECT_CALL(*mockStream, Exists)
+        .WillRepeatedly(Return(true));
+    EXPECT_CALL(*mockStream, Open(BinData::FileMode::Read))
+        .Times(Exactly(1));
+    EXPECT_CALL(*mockStream, Mode())
+        .Times(AtLeast(1))
+        .WillRepeatedly(Return(BinData::FileMode::Read));
+    EXPECT_CALL(*mockStream, Size())
+        .Times(AtLeast(1))
+        .WillRepeatedly(Return(8));
+    {
+        InSequence seq;       
+        EXPECT_CALL(*field1, Size())
+            .Times(AtLeast(1))
+            .WillRepeatedly(Return(4));
+        EXPECT_CALL(*field2, Size())
+            .Times(AtLeast(1))
+            .WillRepeatedly(Return(4));
+    }      
+    EXPECT_CALL(mockFieldStruct, Fields())
+        .Times(AtLeast(1))
+        .WillRepeatedly(Return(fields));
+    EXPECT_CALL(*mockStream, Offset())
+        .WillOnce(Return(0))
+        .WillOnce(Return(4));
+    EXPECT_CALL(*mockStream, Read(field1.get()))
+        .Times(Exactly(1));
+    EXPECT_CALL(*mockStream, Read(field2.get()))
+        .Times(Exactly(1));
+
+    ASSERT_NO_THROW(testFile->Open(BinData::FileMode::Read));
+    ASSERT_NO_THROW(testFile->Read(&mockFieldStruct));
+}
+
+TEST_F(RawFileTests, WritesFieldStructProperly)
+{
+    InitializeTestFile();
+    auto field1 = std::make_shared<MockField>();
+    auto field2 = std::make_shared<MockField>();
+    std::vector<std::shared_ptr<Field>> fields
+    {
+        field1,
+        field2
+    };
+
+    EXPECT_CALL(*mockStream, IsOpen())
+        .WillOnce(Return(false))
+        .WillRepeatedly(Return(true));
+    EXPECT_CALL(*mockStream, Exists)
+        .WillRepeatedly(Return(true));
+    EXPECT_CALL(*mockStream, Open(BinData::FileMode::Write))
+        .Times(Exactly(1));
+    EXPECT_CALL(*mockStream, Mode())
+        .Times(AtLeast(1))
+        .WillRepeatedly(Return(BinData::FileMode::Write));
+    EXPECT_CALL(*mockStream, Size())
+        .Times(AtLeast(1))
+        .WillRepeatedly(Return(8));
+    EXPECT_CALL(mockFieldStruct, Fields())
+        .Times(AtLeast(1))
+        .WillRepeatedly(Return(fields));
+    EXPECT_CALL(*mockStream, Offset())
+        .WillOnce(Return(0))
+        .WillOnce(Return(4));
+    {
+        InSequence seq;
+        EXPECT_CALL(*mockStream, Write(field1.get()))
+            .Times(Exactly(1));
+        EXPECT_CALL(*mockStream, Write(field2.get()))
+            .Times(Exactly(1));
+    }  
+    ASSERT_NO_THROW(testFile->Open(BinData::FileMode::Write));
+    ASSERT_NO_THROW(testFile->Write(&mockFieldStruct));
+}
+
+TEST_F(RawFileTests, FindsChunkHeaderProperly)
+{
+    InitializeTestFile();
+
+    ChunkHeader header1;
+    header1.ID()->SetData("Test1");
+    header1.Size()->SetValue(4);
+    MockField data1;
+    ChunkHeader header2;
+    header2.ID()->SetData("Test2");
+    header2.Size()->SetValue(4);
+    MockField data2;
+    ChunkHeader header3;
+    header3.ID()->SetData("Test3");
+    header3.Size()->SetValue(4);
+    MockField data3;
+
+    EXPECT_CALL(*mockStream, IsOpen())
+        .WillOnce(Return(false))
+        .WillRepeatedly(Return(true));
+    EXPECT_CALL(*mockStream, Exists)
+        .WillRepeatedly(Return(true));
+    EXPECT_CALL(*mockStream, Open(BinData::FileMode::Read))
+        .Times(Exactly(1));
+    EXPECT_CALL(*mockStream, Mode())
+        .Times(AtLeast(1))
+        .WillRepeatedly(Return(BinData::FileMode::Read));
+    EXPECT_CALL(*mockStream, Size())
+        .Times(AtLeast(1))
+        .WillRepeatedly(Return(36));
+
+    EXPECT_CALL(data1, Size())
+        .Times(AtLeast(1))
+        .WillRepeatedly(Return(4));
+    EXPECT_CALL(data2, Size())
+        .Times(AtLeast(1))
+        .WillRepeatedly(Return(4));
+    EXPECT_CALL(data3, Size())
+        .Times(AtLeast(1))
+        .WillRepeatedly(Return(4));
+
+    EXPECT_CALL(*mockStream, Offset())
+        .WillOnce(Return(0));
+    EXPECT_CALL(*mockStream, Read(header1.ID().get()))
+        .Times(Exactly(1));
+    EXPECT_CALL(*mockStream, Read(header1.Size().get()))
+        .Times(Exactly(1));
+    EXPECT_CALL(*mockStream, Read(&data1))
+        .Times(Exactly(1));
+    EXPECT_CALL(*mockStream, Read(header2.ID().get()))
+        .Times(Exactly(1));
+
+    ASSERT_NO_THROW(testFile->Open(BinData::FileMode::Read));
+    
+    ChunkHeader returnedHeader = testFile->FindChunkHeader("Test2");
+    EXPECT_EQ(returnedHeader.ID()->ToString(), "Test2");
+    EXPECT_EQ(returnedHeader.Size()->Value(), 4);
 }
 
 TEST_F(RawFileTests, AppendsFileProperly)

@@ -36,7 +36,7 @@ TEST_F(IntFieldTests, CreatesIntFieldsWithAlternateConstructorsProperly)
     BinData::Int16Field f16{ int16Val };
     EXPECT_EQ(f16.Value(), int16Val);
 
-    BinData::Int16Field f16BE{ int16Val, BinData::FieldEndianness::Big };
+    BinData::Int16Field f16BE{ int16Val, BinData::Endianness::Big };
     for (int i = 0; i < f16BE.Size(); i++)
         EXPECT_EQ(f16BE.Data()[i], static_cast<char>(int16DataBE[i]));
 }

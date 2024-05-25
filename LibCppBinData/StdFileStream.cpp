@@ -77,10 +77,11 @@ namespace BinData
         mStream.seekg(mOffset);
     }
 
+    /*
     RawFile CreateFile(std::string fileName)
     {
         auto standardStream = std::make_shared<StdFileStream>(fileName);
         auto baseStream = std::static_pointer_cast<FileStream>(standardStream);
         return RawFile{ baseStream };
-    }
+    }*/
 }

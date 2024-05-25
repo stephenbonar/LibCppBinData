@@ -20,6 +20,7 @@ set(LIB_SOURCES
     Field.cpp
     Format.cpp
     RawField.cpp
+    FieldStruct.cpp
     StringField.cpp
     IntField.cpp
     StdFileStream.cpp)

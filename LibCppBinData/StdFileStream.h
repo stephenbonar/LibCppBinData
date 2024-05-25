@@ -81,7 +81,7 @@ namespace BinData
         std::size_t mOffset;
     };
 
-    RawFile CreateFile(std::string fileName);
+    //RawFile CreateFile(std::string fileName);
 }
 
 #endif

@@ -24,24 +24,30 @@
 #include "RawFile.h"
 #include "FileStream.h"
 #include "MockField.h"
+#include "MockFieldStruct.h"
 
-class RawFileTests : public ::testing::Test
+namespace BinData
 {
-protected:
-    std::shared_ptr<MockFileStream> mockStream;
-    std::shared_ptr<BinData::FileStream> mockStreamBasePtr;
-    std::unique_ptr<BinData::RawFile> testFile;
-    MockField mockField;
+    class RawFileTests : public ::testing::Test
+    {
+    protected:
+        std::shared_ptr<MockFileStream> mockStream;
+        std::shared_ptr<BinData::FileStream> mockStreamBasePtr;
+        std::unique_ptr<BinData::RawFile> testFile;
+        MockField mockField;
+        MockFieldStruct mockFieldStruct;
 
-    RawFileTests();
+        RawFileTests();
 
-    void InitializeTestFile();
+        void InitializeTestFile();
 
-    void ExpectClosed(BinData::FileMode m);
+        void ExpectClosed(BinData::FileMode m);
 
-    void ExpectOpened(BinData::FileMode m);
+        void ExpectOpened(BinData::FileMode m);
 
-    void ExpectOpensAndClosesProperly(BinData::FileMode m);
-};
+        void ExpectOpensAndClosesProperly(BinData::FileMode m);
+    };
+}
+
 
 #endif

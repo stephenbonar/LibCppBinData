@@ -1,4 +1,4 @@
-// BinData.h - Main library header file.
+// Endianness.h - Declares the Endianness enum.
 //
 // Copyright (C) 2024 Stephen Bonar
 //
@@ -14,17 +14,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef LIB_CPP_BIN_DATA_H
-#define LIB_CPP_BIN_DATA_H
+#ifndef BIN_DATA_ENDIANNESS_H
+#define BIN_DATA_ENDIANNESS_H
 
-#include "Field.h"
-#include "FieldStruct.h"
-#include "ChunkHeader.h"
-#include "File.h"
-#include "Format.h"
-#include "IntField.h"
-#include "RawField.h"
-#include "StdFileStream.h"
-#include "StringField.h"
+namespace BinData
+{
+    enum class Endianness
+    {
+        Little,
+        Big
+    };
+}
 
 #endif

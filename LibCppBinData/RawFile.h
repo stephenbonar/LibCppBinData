@@ -25,6 +25,7 @@
 #include <memory>
 #include "Field.h"
 #include "FileStream.h"
+#include "StdFileStream.h"
 #include "File.h"
 
 namespace BinData
@@ -32,6 +33,8 @@ namespace BinData
     class RawFile : public File
     {
     public:
+        RawFile(std::string fileName);
+
         /// @brief Constructs a new instance of File.
         /// @param stream The FileStream to use for reading and writing. 
         /// @invariant A file can only be open in one mode at a time.
@@ -66,6 +69,12 @@ namespace BinData
         /// @pre The offset must be no greater than file size.
         /// @post The offset must have advanced by field size.
         void Write(Field* f) override;
+
+        void Read(FieldStruct* s) override;
+
+        void Write(FieldStruct* s) override;
+
+        ChunkHeader FindChunkHeader(std::string ID) override;
 
         std::string Name() const override
         {

@@ -18,6 +18,11 @@
 
 namespace BinData
 {
+    RawFile::RawFile(std::string fileName)
+    {
+        mStream = std::make_shared<StdFileStream>(fileName);
+    }
+
     RawFile::RawFile(std::shared_ptr<FileStream> stream) 
         : mStream{ stream }
     {
@@ -55,6 +60,24 @@ namespace BinData
             };
         }
         mStream->Write(f);
+    }
+
+    void RawFile::Read(FieldStruct* s)
+    {
+        for (std::shared_ptr<Field> f : s->Fields())
+            Read(f.get());
+    }
+
+    void RawFile::Write(FieldStruct* s)
+    {
+        for (std::shared_ptr<Field> f : s->Fields())
+            Write(f.get());
+    }
+    ChunkHeader RawFile::FindChunkHeader(std::string ID)
+    {
+        
+        
+        return ChunkHeader{};
     }
 
     void RawFile::SetOffset(std::size_t o)

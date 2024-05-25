@@ -26,16 +26,11 @@
 #include "Field.h"
 #include "Format.h"
 #include "IntConstants.h"
+#include "Endianness.h"
 
 namespace BinData
 {   
     extern const char* intFieldFormatError;
-
-    enum class FieldEndianness
-    {
-        Little,
-        Big
-    };
 
     // We need to forward declare both the class template and its operator<<
     // to allow both templates to recognize each other.
@@ -48,52 +43,51 @@ namespace BinData
     class IntField : public Field
     {
     public:
-        IntField(FieldEndianness endianness = FieldEndianness::Little) 
-            : mEndianness{ endianness }
+        IntField(Endianness endian = Endianness::Little) 
+            : endian{ endian }
         {
-            mData = std::make_unique<char[]>(size);
+            data = std::make_unique<char[]>(size);
         }
 
-        IntField(ValueType value, 
-            FieldEndianness endianness = FieldEndianness::Little)
-            : mEndianness{ endianness }
+        IntField(ValueType value, Endianness endian = Endianness::Little)
+            : endian{ endian }
         {
-            mData = std::make_unique<char[]>(size);
+            data = std::make_unique<char[]>(size);
             SetValue(value);
         }
 
         IntField(const IntField& f)
         {
-            mData = std::make_unique<char[]>(size);
-            std::memcpy(mData.get(), f.mData.get(), size);
-            mEndianness = f.mEndianness;
+            data = std::make_unique<char[]>(size);
+            std::memcpy(data.get(), f.data.get(), size);
+            endian = f.endian;
         }
 
         IntField(IntField&& f)
         {
-            mData = std::move(f.mData);
-            mEndianness = f.mEndianness;
+            data = std::move(f.data);
+            endian = f.endian;
         }
 
         IntField& operator=(const IntField& f)
         {
             auto copiedData = std::make_unique<char[]>(size);
-            std::memcpy(copiedData.get(), f.mData.get(), size);
-            mData = std::move(copiedData);
-            mEndianness = f.mEndianness;
+            std::memcpy(copiedData.get(), f.data.get(), size);
+            data = std::move(copiedData);
+            endian = f.endian;
             return *this;
         }
 
         IntField& operator=(IntField&& f)
         {
-            mData = std::move(f.mData);
-            mEndianness = f.mEndianness;
+            data = std::move(f.data);
+            endian = f.endian;
             return *this;
         }
 
-        FieldEndianness Endianness() const
+        Endianness Endian() const
         {
-            return mEndianness;
+            return endian;
         }
 
         /// @brief Gets the size of the field, in bytes.
@@ -114,16 +108,16 @@ namespace BinData
         /// @return The value of the data as a native integer type.
         ValueType Value() const
         {
-            if (mData == nullptr)
+            if (data == nullptr)
                 throw InvalidField{ nullFieldError };
-            if (mEndianness == FieldEndianness::Little)
+            if (endian == Endianness::Little)
                 return ValueLEToLE();
             else
                 return ValueBEToLE();
 
             // TODO: On big endian systems, disable the above code and enable
             // the code below:
-            // if (mEndianness == BinData::FieldEndianness::Big)
+            // if (mEndianness == BinData::Endianness::Big)
             //     return ValueBEToBE();
             // else
             //     return ValueLEToBE();
@@ -153,14 +147,14 @@ namespace BinData
         /// @throw InvalidFormat when an invalid format is specified.
         std::string ToString(Format f) const override
         {
-            if (mData == nullptr)
+            if (data == nullptr)
                 throw InvalidField{ nullFieldError };
             switch(f)
             {
                 case Format::Hex:
-                    return FormatHex(mData.get(), size);
+                    return FormatHex(data.get(), size);
                 case Format::Bin:
-                    return FormatBin(mData.get(), size);
+                    return FormatBin(data.get(), size);
                 case Format::Dec:
                     return ToString();
                 case Format::Ascii:
@@ -180,7 +174,7 @@ namespace BinData
         /// @return The raw pointer to the underlying data.
         char* Data() override
         {
-            return mData.get();
+            return data.get();
         }
 
         /*
@@ -199,9 +193,9 @@ namespace BinData
             //return ValueLEToBE();
         }*/
 
-        void SetEndianness(FieldEndianness endianness)
+        void SetEndian(Endianness endian)
         {
-            mEndianness = endianness;
+            this->endian = endian;
         }
 
         /// @brief Sets the field to the value of the specified integer.
@@ -214,9 +208,9 @@ namespace BinData
         /// @param v The value to set the field to.
         void SetValue(ValueType v)
         {
-            if (mData != nullptr)
+            if (data != nullptr)
             {
-                if (mEndianness == FieldEndianness::Little)
+                if (endian == Endianness::Little)
                     SetValueLEToLE(v);
                 else
                     SetValueLEToBE(v);
@@ -226,7 +220,7 @@ namespace BinData
 
             // TODO: On big endian systems, disable the above code and enable
             // the code below:
-            // if (mEndianness == BigData::FieldEndianness::Big)
+            // if (mEndianness == BinData::Endianness::Big)
             //     SetValueBEToBE(v);
             // else
             //     SetValueBEToLE(v);
@@ -247,8 +241,8 @@ namespace BinData
     //protected:
     //    Format defaultFormat;
     private:
-        std::unique_ptr<char[]> mData;
-        FieldEndianness mEndianness;
+        std::unique_ptr<char[]> data;
+        Endianness endian;
 
         // Call this function when the data is stored in little endian format
         // and the system has little endian integers . 
@@ -270,7 +264,7 @@ namespace BinData
             // result size (likely true for all field sizes less than 
             // Int64Field), we need to set the unused most significant bytes 
             // to 0xFF to ensure the result is interpreted as 2's compliment.
-            bool signBitSet = (mData[size - 1] & signBitMask) == signBitMask;
+            bool signBitSet = (data[size - 1] & signBitMask) == signBitMask;
             if (std::numeric_limits<ValueType>::is_signed && signBitSet)
                 result = GetSignBitPaddingLE();
     
@@ -284,7 +278,7 @@ namespace BinData
                 // Convert the byte to unsigned to avoid any implicit sign
                 // conversion.
                 unsigned char currentByte = static_cast<unsigned char>(
-                    mData[i]);
+                    data[i]);
 
                 // Copy the currentByte into another unsigned long long to 
                 // match result so they can be bitwise or'd together without
@@ -356,7 +350,7 @@ namespace BinData
             // result size (likely true for all field sizes less than 
             // Int64Field), we need to set the unused most significant bytes 
             // to 0xFF to ensure the result is interpreted as 2's compliment.
-            bool signBitSet = (mData[0] & signBitMask) == signBitMask;
+            bool signBitSet = (data[0] & signBitMask) == signBitMask;
             if (std::numeric_limits<ValueType>::is_signed && signBitSet)
                 result = GetSignBitPaddingLE();
             
@@ -368,7 +362,7 @@ namespace BinData
                 // Convert the byte to unsigned to avoid any implicit sign
                 // conversion.
                 unsigned char currentByte = static_cast<unsigned char>(
-                    mData[i]);
+                    data[i]);
 
                 // Copy the currentByte into another unsigned long long to 
                 // match result so they can be bitwise or'd together without
@@ -480,7 +474,7 @@ namespace BinData
                 unsigned long long shiftedBitMask = bitMask << bitsToShift;
                 unsigned long long byte = value & shiftedBitMask;
                 unsigned long long shiftedByte = byte >> bitsToShift;
-                mData[i] = static_cast<char>(shiftedByte);
+                data[i] = static_cast<char>(shiftedByte);
             }
         }
 
@@ -495,7 +489,7 @@ namespace BinData
                 unsigned long long shiftedBitMask = bitMask << bitsToShift;
                 unsigned long long byte = value & shiftedBitMask;
                 unsigned long long shiftedByte = byte >> bitsToShift;
-                mData[i] = static_cast<char>(shiftedByte);
+                data[i] = static_cast<char>(shiftedByte);
                 bytesToShift--;
             }
         }

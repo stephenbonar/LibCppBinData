@@ -24,6 +24,7 @@
 #include <string>
 #include "IntField.h"
 #include "Format.h"
+#include "Endianness.h"
 
 constexpr unsigned int uInt8Val{ 42 };
 constexpr int int8Val{ -42 };
@@ -98,7 +99,7 @@ public:
     void ExpectCreatedProperly(std::size_t expectedSize)
     {
         FieldType field{};
-        EXPECT_EQ(field.Endianness(), BinData::FieldEndianness::Little);
+        EXPECT_EQ(field.Endian(), BinData::Endianness::Little);
         EXPECT_EQ(field.Size(), expectedSize);
         EXPECT_EQ(field.Value(), 0);
     }
@@ -116,7 +117,7 @@ public:
         IntType expectedValue)
     {
         FieldType field{};
-        field.SetEndianness(BinData::FieldEndianness::Big);
+        field.SetEndian(BinData::Endianness::Big);
         ASSERT_EQ(rawData.size(), field.Size());
         std::memcpy(field.Data(), rawData.data(), field.Size());
         EXPECT_EQ(field.Value(), expectedValue);
@@ -151,7 +152,7 @@ public:
         IntType value)
     {
         FieldType field{};
-        field.SetEndianness(BinData::FieldEndianness::Big);
+        field.SetEndian(BinData::Endianness::Big);
         ASSERT_NO_THROW(field.SetValue(value));
         for (int i = 0; i < field.Size(); i++)
             EXPECT_EQ(field.Data()[i], static_cast<char>(rawData[i]));
@@ -178,7 +179,7 @@ public:
         EXPECT_EQ(f1.Data(), nullptr);
         ASSERT_NE(f2.Data(), nullptr);
         EXPECT_EQ(f2.Value(), 42);
-        EXPECT_EQ(f2.Endianness(), BinData::FieldEndianness::Little);
+        EXPECT_EQ(f2.Endian(), BinData::Endianness::Little);
         FieldType f3{ };
         f3 = std::move(f2);
         EXPECT_THROW(f1.Value(), BinData::InvalidField);

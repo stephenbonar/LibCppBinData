@@ -1,4 +1,4 @@
-// MockField.h - Declares the MockField class.
+// MockFieldStruct.h - Declares the MockFieldStruct class.
 //
 // Copyright (C) 2024 Stephen Bonar
 //
@@ -14,21 +14,28 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef MOCK_FIELD_H
-#define MOCK_FIELD_H
+#ifndef MOCK_FIELD_STRUCT_H
+#define MOCK_FIELD_STRUCT_H
 
+#include <vector>
+#include <memory>
 #include <gmock/gmock.h>
+#include "FieldStruct.h"
 #include "Field.h"
 
 namespace BinData
 {
-    class MockField : public Field
+    class MockFieldStruct : public BinData::FieldStruct
     {
     public:
+        MOCK_METHOD(std::vector<std::shared_ptr<Field>>, Fields, (), (const, override));
+
+        /*
         MOCK_METHOD(char*, Data, (), (override));
         MOCK_METHOD(std::size_t, Size, (), (const, override)); 
         MOCK_METHOD(std::string, ToString, (), (const, override));
         MOCK_METHOD(std::string, ToString, (BinData::Format f), (const, override));
+        */
     };
 }
 

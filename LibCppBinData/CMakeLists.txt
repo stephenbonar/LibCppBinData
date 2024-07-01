@@ -23,6 +23,7 @@ set(LIB_SOURCES
     FieldStruct.cpp
     StringField.cpp
     IntField.cpp
+    FileStream.cpp
     StdFileStream.cpp)
 
 # Configure the library build target.

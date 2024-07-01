@@ -310,18 +310,21 @@ TEST_F(RawFileTests, FindsChunkHeaderProperly)
 {
     InitializeTestFile();
 
+    /*
     ChunkHeader header1;
-    header1.ID()->SetData("Test1");
+    header1.ID()->SetData("TST1");
     header1.Size()->SetValue(4);
     MockField data1;
+
     ChunkHeader header2;
-    header2.ID()->SetData("Test2");
+    header2.ID()->SetData("TST2");
     header2.Size()->SetValue(4);
     MockField data2;
+
     ChunkHeader header3;
-    header3.ID()->SetData("Test3");
+    header3.ID()->SetData("TST3");
     header3.Size()->SetValue(4);
-    MockField data3;
+    MockField data3;*/
 
     EXPECT_CALL(*mockStream, IsOpen())
         .WillOnce(Return(false))
@@ -337,32 +340,41 @@ TEST_F(RawFileTests, FindsChunkHeaderProperly)
         .Times(AtLeast(1))
         .WillRepeatedly(Return(36));
 
-    EXPECT_CALL(data1, Size())
-        .Times(AtLeast(1))
-        .WillRepeatedly(Return(4));
-    EXPECT_CALL(data2, Size())
-        .Times(AtLeast(1))
-        .WillRepeatedly(Return(4));
-    EXPECT_CALL(data3, Size())
-        .Times(AtLeast(1))
-        .WillRepeatedly(Return(4));
-
     EXPECT_CALL(*mockStream, Offset())
-        .WillOnce(Return(0));
-    EXPECT_CALL(*mockStream, Read(header1.ID().get()))
-        .Times(Exactly(1));
-    EXPECT_CALL(*mockStream, Read(header1.Size().get()))
-        .Times(Exactly(1));
-    EXPECT_CALL(*mockStream, Read(&data1))
-        .Times(Exactly(1));
-    EXPECT_CALL(*mockStream, Read(header2.ID().get()))
-        .Times(Exactly(1));
+        .WillOnce(Return(0))   // AtTheEnd()
+        .WillOnce(Return(0))   // Read() for ID, advances offset
+        .WillOnce(Return(4))   // Read() for Size, advances offset
+        .WillOnce(Return(8))   // Offset() for calcuating next offset
+        .WillOnce(Return(12))  // AtTheEnd(), assumes SetOffset skiped 4 bytes
+        .WillOnce(Return(12))  // Read() for ID, advances offset
+        .WillOnce(Return(16)); // Read() for Size, advances offset
+    EXPECT_CALL(*mockStream, Read(_))
+        .WillOnce([](Field* f)
+                  {  
+                      StringField s{ "TST1", 4 };
+                      std::memcpy(f->Data(), s.Data(), s.Size());
+                  })
+        .WillOnce([](Field* f)
+                  {  
+                      UInt32Field i{ 4 };
+                      std::memcpy(f->Data(), i.Data(), i.Size());
+                  })
+        .WillOnce([](Field* f)
+                  {  
+                      StringField s{ "TST2", 4 };
+                      std::memcpy(f->Data(), s.Data(), s.Size());
+                  })
+        .WillOnce([](Field* f)
+                  {  
+                      UInt32Field i{ 4 };
+                      std::memcpy(f->Data(), i.Data(), i.Size());
+                  });
 
     ASSERT_NO_THROW(testFile->Open(BinData::FileMode::Read));
     
-    ChunkHeader returnedHeader = testFile->FindChunkHeader("Test2");
-    EXPECT_EQ(returnedHeader.ID()->ToString(), "Test2");
-    EXPECT_EQ(returnedHeader.Size()->Value(), 4);
+    std::shared_ptr<ChunkHeader> header = testFile->FindChunkHeader("TST2");
+    EXPECT_EQ(header->ID()->ToString(), "TST2");
+    EXPECT_EQ(header->Size()->Value(), 4);
 }
 
 TEST_F(RawFileTests, AppendsFileProperly)

@@ -20,10 +20,16 @@ using namespace BinData;
 
 bool FileStream::IsAtBeginning() const
 {
-
+    if (Offset() == 0)
+        return true;
+    else
+        return false;
 }
 
 bool FileStream::IsAtEnd() const
 {
-    
+    if (Offset() == Size())
+        return true;
+    else
+        return false;
 }

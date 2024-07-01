@@ -73,18 +73,34 @@ namespace BinData
         for (std::shared_ptr<Field> f : s->Fields())
             Write(f.get());
     }
-    ChunkHeader RawFile::FindChunkHeader(std::string ID)
+
+    std::shared_ptr<ChunkHeader> RawFile::FindChunkHeader(std::string ID)
     {
+        auto header = std::make_shared<ChunkHeader>();
+
+        while (!mStream->IsAtEnd())
+        {
+            Read(header.get());
+            std::string headerID = header->ID()->ToString();
+
+            if (headerID == ID)
+            {
+                return header;
+            }
+            else
+            {
+                std::size_t next = mStream->Offset() + header->Size()->Value();
+                mStream->SetOffset(next);
+            }
+        }
         
-        
-        return ChunkHeader{};
+        return nullptr;
     }
 
     void RawFile::SetOffset(std::size_t o)
     {
         if (o > Size())
             throw InvalidFileOperation{ "Offset cannot be beyond file size" };
-        //mOffset = offset;
         mStream->SetOffset(o);
     }
 

@@ -122,9 +122,11 @@ namespace BinData
         /// @param offset The offset to start the next read or write operation
         /// @pre Offset must not be greater than equal to the file size
         void SetOffset(std::size_t offset) override;
+    protected:
+        std::shared_ptr<FileStream> mStream;
     private:
         std::string mName;
-        std::shared_ptr<FileStream> mStream;
+        //std::shared_ptr<FileStream> mStream;
 
         bool IsOpenForReading();
 

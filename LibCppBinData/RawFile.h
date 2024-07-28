@@ -74,7 +74,9 @@ namespace BinData
 
         void Write(FieldStruct* s) override;
 
-        std::shared_ptr<ChunkHeader> FindChunkHeader(std::string ID) override;
+        std::shared_ptr<ChunkHeader> FindChunkHeader(std::string ID,
+            BinData::Endianness endianness = BinData::Endianness::Little)
+            override;
 
         std::string Name() const override
         {

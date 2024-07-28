@@ -74,9 +74,10 @@ namespace BinData
             Write(f.get());
     }
 
-    std::shared_ptr<ChunkHeader> RawFile::FindChunkHeader(std::string ID)
+    std::shared_ptr<ChunkHeader> RawFile::FindChunkHeader(std::string ID,
+        BinData::Endianness endianness)
     {
-        auto header = std::make_shared<ChunkHeader>();
+        auto header = std::make_shared<ChunkHeader>(endianness);
 
         while (!mStream->IsAtEnd())
         {

@@ -82,7 +82,8 @@ namespace BinData
 
         virtual void Write(FieldStruct* s) = 0;
 
-        virtual std::shared_ptr<ChunkHeader> FindChunkHeader(std::string ID)
+        virtual std::shared_ptr<ChunkHeader> FindChunkHeader(std::string ID, 
+            BinData::Endianness endianness = BinData::Endianness::Little)
             = 0;
 
         virtual std::string Name() const = 0;
